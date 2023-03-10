@@ -3,13 +3,23 @@ import inquirer from "inquirer";
 import chalk from "chalk";
 import chalkAnimation from "chalk-animation";
 console.clear();
+//------------------------------------------------------------------------------
+//CLASSES/CONSTRUCTORS/OOPs HERE
+//------------------------------------------------------------------------------
+const defValue = {
+    Completed: 'Completed',
+    Pending: 'Pending'
+};
+//------------------------------------------------------------------------------
+//FUNCTIONS HERE
+//------------------------------------------------------------------------------
 const stopTime = () => {
     return new Promise((res) => {
         setTimeout(res, 3500);
     });
 };
 async function welcome() {
-    let rainbowTitle = chalkAnimation.neon("Welcome To ATM Banking!\n\nCoded By Hosein Sirat Mohammad\n");
+    let rainbowTitle = chalkAnimation.neon("Welcome To ToDO App!\n\nCoded By Hosein Sirat Mohammad\n");
     await stopTime();
     rainbowTitle.stop();
 }
@@ -60,7 +70,7 @@ async function showTaskFunc() {
     if (arrToDos.length > 0) {
         let i = 1;
         arrToDos.forEach((value) => {
-            if (value.Status == 'Pending')
+            if (value.Status == defValue.Pending)
                 console.log(chalk.bgBlue('\t\tTask ' + i) + ' >>>>>>>>> ' + (chalk.bgBlue(value.Action)) + ' >>>>>>>>> ' + (chalk.bgBlue(value.Status)));
             else
                 console.log(chalk.bgGreen('\t\tTask ' + i) + ' >>>>>>>>> ' + (chalk.bgGreen(value.Action)) + ' >>>>>>>>> ' + (chalk.bgGreen(value.Status)));
@@ -90,33 +100,38 @@ async function addTaskFunc() {
         .then((value) => {
         arrToDos.push({
             Action: value.addTask,
-            Status: 'Pending'
+            Status: defValue.Pending
         });
         console.log(chalk.inverse('Task added successfully.\n'));
     });
 }
 ;
 async function completeTaskFunc() {
-    await inquirer.prompt([
-        {
-            type: 'list',
-            name: 'completed',
-            message: 'Select the task to complete.',
-            choices: arrToDos.filter((todo) => todo.Status != 'Completed').map((todo) => todo.Action)
-        }
-    ])
-        .then((answers) => {
-        const todo = arrToDos.find((todo) => todo.Action === answers.completed);
-        todo.Status = 'Completed';
-        console.log(todo);
-        //arrToDos[todo].Status = 'Completed';
-        console.log(chalk.bgGreenBright("Task completed successfully.\n"));
-    });
+    if (arrToDos.filter((todo) => todo.Status == defValue.Pending).map((todo) => todo.Action).length > 0) {
+        await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'completed',
+                message: 'Select the task to complete.',
+                choices: arrToDos.filter((todo) => todo.Status == defValue.Pending).map((todo) => todo.Action)
+            }
+        ])
+            .then((answers) => {
+            const todo = arrToDos.find((todo) => todo.Action === answers.completed);
+            todo.Status = defValue.Completed;
+            console.log(todo);
+            //arrToDos[todo].Status = 'Completed';
+            console.log(chalk.bgGreenBright("Task completed successfully.\n"));
+        });
+    }
+    else {
+        console.log(chalk.bgYellowBright('No task Pending.\n'));
+    }
 }
 ;
 //------------------------------------------------------------------------------
 //MAIN
 //------------------------------------------------------------------------------
-// await welcome();
+await welcome();
 const arrToDos = [];
 await mainMenu();
