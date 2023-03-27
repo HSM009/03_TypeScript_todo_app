@@ -1,5 +1,4 @@
 #! /usr/bin/env node
-
 import inquirer from "inquirer";
 import chalk from "chalk";
 import chalkAnimation from "chalk-animation";
@@ -44,6 +43,10 @@ async function mainMenu() {
                     value: 'completeTask'
                 },
                 {
+                    name: 'Delete a ToDo task',
+                    value: 'deleteTask'
+                },
+                {
                     name: 'Bye',
                     value: 'bye'
                 }
@@ -60,6 +63,10 @@ async function mainMenu() {
     }
     else if (selectedOption.menuOption == 'completeTask') {
         await completeTaskFunc();
+        mainMenu();
+    }
+    else if (selectedOption.menuOption == 'deleteTask') {
+        await deleteTaskFunc();
         mainMenu();
     }
     else {
@@ -130,6 +137,37 @@ async function completeTaskFunc() {
     }
 }
 ;
+async function deleteTaskFunc() {
+    if (arrToDos.filter((todo) => todo.Status == defValue.Pending).map((todo) => todo.Action).length > 0) {
+        await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'deleted',
+                message: 'Select the task to delete',
+                choices: arrToDos.filter((todo) => todo.Status == defValue.Pending).map((todo) => todo.Action)
+            },
+            {
+                type: 'confirm',
+                name: 'confirm',
+                message: chalk.red('Do you want to continue delete?')
+            }
+        ])
+            .then((answers) => {
+            if (answers.confirm == true) {
+                // const todo:any = arrToDos.find((todo) => todo.Action === answers.deleted);
+                let delToDo = arrToDos.indexOf(answers.deleted);
+                arrToDos.splice(delToDo, 1);
+                console.log(chalk.bgGreenBright("Task deleted successfully.\n"));
+            }
+            else {
+                console.log(chalk.bgRed("Task iqnored.\n"));
+            }
+        });
+    }
+    else {
+        console.log(chalk.bgYellowBright('No task Pending.\n'));
+    }
+}
 //------------------------------------------------------------------------------
 //MAIN
 //------------------------------------------------------------------------------
